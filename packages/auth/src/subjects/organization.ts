@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { organizationSchema } from '../models/organization'
+
 export const organizationSubject = z.tuple([
   z.union([
     z.literal('delete'),
@@ -8,7 +10,7 @@ export const organizationSubject = z.tuple([
     z.literal('transfer_ownership'),
     z.literal('create'),
   ]),
-  z.literal('Organization'),
+  z.union([z.literal('Organization'), organizationSchema]),
 ])
 
 export type organizationSubject = z.infer<typeof organizationSubject>
