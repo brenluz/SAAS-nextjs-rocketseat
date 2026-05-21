@@ -1,4 +1,7 @@
 {
   "extends": "@saas/ts-config/library.json",
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "prisma.config.ts" ],
+  "compilerOptions": {
+  "types": ["node"]
+  }
 }

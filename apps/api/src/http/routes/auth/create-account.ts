@@ -1,6 +1,5 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import { request } from "https";
 import { z } from "zod";
 
 export async function createAccount(app: FastifyInstance) {

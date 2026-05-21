@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id    String @id @default(cuid())
+  name String
+  passwordHash String? @map("password_hash")
+  email String @unique
+  avatarUrl String? @map("avatar_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  tokens Token[]
+  accounts Account[]
+  Invites Invite[]
+
+  @@map("users")
+}
+
+enum TokenType {
+  PASSWORD_RECOVER
+}
+
+model Token {
+  id    String @id @default(cuid())
+  type TokenType
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  @@map("tokens")
+}
+
+enum AccountProvider {
+  GITHUB
+}
+
+model Account {
+  id    String @id @default(cuid())
+  provider AccountProvider
+  providerId String @unique
+  userId String @map("user_id")
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([provider, userId])
+  @@map("accounts")
+}
+
+model Invite {
+  id    String @id @default(cuid())
+  email String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  author User? @relation(fields: [userId], references: [id])
+  userId String? @map("user_id")
+
+  Organization Organization @relation(fields: [organizationId], references: [id])
+  organizationId String @map("organization_id")
+
+  @@unique([email, organizationId])
+  @@index([email])
+  @@map("invites")
+}
+
+model Member {
+  id    String @id @default(cuid())
+
+  
+  @@map("members")
+}
+
+model Organization {
+  id    String @id @default(cuid())
+
+  invites Invite[]
+
+  @@map("organizations")
+}
+
+model Project {
+  id    String @id @default(cuid())
+  @@map("projects")
+}
+
