@@ -23,7 +23,9 @@ model User {
 
   tokens Token[]
   accounts Account[]
-  Invites Invite[]
+  invites Invite[]
+  member_on Member[]
+  owns_organizations Organization[]
 
   @@map("users")
 }
@@ -58,9 +60,16 @@ model Account {
   @@map("accounts")
 }
 
+enum Role {
+  MEMBER
+  ADMIN
+  BILLING
+}
+
 model Invite {
   id    String @id @default(cuid())
   email String
+  role Role @default(MEMBER)
   createdAt DateTime @default(now()) @map("created_at")
 
   author User? @relation(fields: [userId], references: [id])
@@ -76,16 +85,31 @@ model Invite {
 
 model Member {
   id    String @id @default(cuid())
+  role Role @default(MEMBER)
 
-  
+  organization Organization @relation(fields: [organizationId], references: [id])
+  organizationId String @map("organization_id")
+
+  user User @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  @@unique([organizationId, userId])
   @@map("members")
 }
 
 model Organization {
   id    String @id @default(cuid())
+  name String
+  slug String @unique
+  domain String? @unique
+  shouldAttachUsersByDomain Boolean @default(false)
+
+  owner User @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
 
   invites Invite[]
-
+  members Member[]
   @@map("organizations")
 }
 
